@@ -5,6 +5,8 @@ const world = {
     x: 0
 }
 
+// test
+
 console.log(world.x);
 
 for (let k=0; k<10;k++) {

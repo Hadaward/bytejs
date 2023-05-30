@@ -1,25 +1,41 @@
+import { RULES, assert } from "./assert.js";
+
 export class ByteArray {
     constructor(bytes) {
         this.bytes = Array.isArray(bytes) ? bytes : [];
     }
 
     static fromString(string) {
-        if (typeof string !== 'string')
-            throw new TypeError(`expected string, not ${typeof string}: ${string}`);
-
+        assert(string, RULES.String);
         return new ByteArray([...string].map(char => char.codePointAt(0)));
     }
 
     writeByte(value) {
+        assert(value, {
+            type: "number",
+            kind: "integer",
+            validator(value) {
+                return value >= 0 && value <= 255 || `Byte is out of range [0~255]: ${value}`
+            }
+        });
+
         this.bytes.push(value % 255);
     }
 
+    writeBoolean(value) {
+        assert(value, RULES.Boolean);
+        this.writeByte(value ? 1 : 0);
+    }
+
     writeShort(value) {
+        assert(value, RULES.Integer);
         this.writeByte((value >> 8) & 0xFF);
         this.writeByte(value & 0xFF);
     }
 
     writeInt(value) {
+        assert(value, RULES.Integer);
+
         this.writeByte((value >> 24) & 0xFF);
         this.writeByte((value >> 16) & 0xFF);
         this.writeByte((value >> 8) & 0xFF);
@@ -27,62 +43,17 @@ export class ByteArray {
     }
 
     writeString(value) {
-        
-    }
-
-    /**
-     * 0 - string
-     * 1 - integer
-     * 2 - float
-     * 3 - bool
-     * @param {any} value 
-     */
-    writePrimitive(value) {
-        if (typeof value === 'string') {
-            this.writeByte(0);
-            this.writeShort(value.length);
-            for (const code of [...value].map(char => char.codePointAt(0) << 4))
-                this.writeShort(code);
-        } else if (typeof value === 'number') {
-            if (Number.isInteger(value)) {
-                this.writeByte(1);
-                this.writeInt(value);
-            } else {
-                this.writeByte(2);
-                const [integer, float] = value.toString().split(".");
-                this.writeInt(Number(integer));
-                this.writeInt(Number(`1${float}`));
-            }
-        } else if (typeof value === 'boolean') {
-            this.writeByte(3);
-            this.writeByte(value ? 1 : 0);
-        }
-    }
-
-    readPrimitive() {
-        const type = this.readByte();
-
-        if (type === 0) {
-            const length = this.readShort();
-            let result = "";
-
-            for (let k=0;k<length;k++)
-                result += String.fromCodePoint(this.readShort() >> 4);
-
-            return result;
-        } else if (type === 1) {
-            return this.readInt();
-        } else if (type === 2) {
-            const integer = this.readInt().toString();
-            const float = this.readInt().toString().substring(1);
-            return Number(`${integer}.${float}`);
-        } else if (type === 3) {
-            return this.readByte() === 1;
-        }
+        assert(value, RULES.String);
+        this.writeShort(value.length);
+        value.split("").map(char => char.codePointAt(0) << 4).forEach(this.writeShort.bind(this));
     }
 
     readByte() {
         return this.bytes.shift() % 255;
+    }
+
+    readBoolean() {
+        return this.readByte() === 1;
     }
 
     readShort() {
@@ -91,5 +62,15 @@ export class ByteArray {
 
     readInt() {
         return this.readByte() << 24 | this.readByte() << 16 | this.readByte() << 8 | this.readByte();
+    }
+
+    readString() {
+        const size = this.readShort();
+        let value = "";
+
+        for (let k=0;k<size;k++) 
+            value += String.fromCodePoint(this.readShort() >> 4);
+
+        return value;
     }
 }

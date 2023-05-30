@@ -1,11 +1,15 @@
-import { ByteCode } from "./jsvm/bytecode.js";
+import { toByteCode } from "./jsvm/bytecode.js";
 
-const bytes = new ByteCode();
+const bytecode = toByteCode(`
+const world = {
+    x: 0
+}
 
-bytes.parseCode(`
+console.log(world.x);
+
 for (let k=0; k<10;k++) {
     console.log(k);
 }
 `);
 
-console.log(bytes);
+console.log(bytecode);

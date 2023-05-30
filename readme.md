@@ -36,7 +36,7 @@ string // encoded text
 - 8 -> ForStatement
 
 ## How instructions are structured?
-The instructions are organized in a string of bytes [range: 0~255]
+The instructions are organized in a array of bytes [range: 0~255]
 
 ### VariableDeclaration
 - Sub OpCode for declaration kinds:

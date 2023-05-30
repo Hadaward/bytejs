@@ -35,7 +35,7 @@ const generateBytes = {
         if (Object.hasOwn(this, node.type))
             this[node.type](node, bytecode);
         else
-            console.log('Unimpleted', node);
+            console.log('Not implemented:', node);
     },
 
     Program(node, bytecode) {

@@ -1,17 +1,8 @@
 import { toByteCode } from "./jsvm/bytecode.js";
+import { runByteCode } from "./jsvm/runtime.js";
 
 const bytecode = toByteCode(`
-const world = {
-    x: 0
-}
-
-// test
-
-console.log(world.x);
-
-for (let k=0; k<10;k++) {
-    console.log(k);
-}
+console.log("Hello world");
 `);
 
-console.log(bytecode);
+runByteCode(bytecode.bytes);

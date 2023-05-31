@@ -19,7 +19,7 @@ export class ByteArray {
             }
         });
 
-        this.bytes.push(value % 255);
+        this.bytes.push(value % 256);
     }
 
     writeBoolean(value) {
@@ -44,8 +44,11 @@ export class ByteArray {
 
     writeString(value) {
         assert(value, RULES.String);
-        this.writeShort(value.length);
-        value.split("").map(char => char.codePointAt(0) << 4).forEach(this.writeShort.bind(this));
+
+        const bytes = [...new TextEncoder().encode(value)];
+
+        this.writeShort(bytes.length);
+        this.bytes = this.bytes.concat(bytes);
     }
 
     readByte() {
@@ -66,11 +69,7 @@ export class ByteArray {
 
     readString() {
         const size = this.readShort();
-        let value = "";
-
-        for (let k=0;k<size;k++) 
-            value += String.fromCodePoint(this.readShort() >> 4);
-
-        return value;
+        const bytes = this.bytes.splice(0, size);
+        return new TextDecoder().decode(Buffer.from(bytes));
     }
 }

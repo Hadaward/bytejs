@@ -1,3 +1,4 @@
+import { ByteArray } from "./jsvm/bytearray.js";
 import { toByteCode } from "./jsvm/bytecode.js";
 import { runByteCode } from "./jsvm/runtime.js";
 

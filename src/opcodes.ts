@@ -4,5 +4,6 @@ export const OPCODES = {
   CallExpression: 2,
   MemberExpression: 3,
   Identifier: 4,
-  Literal: 5
+  Literal: 5,
+  ChainExpression: 6
 }

@@ -18,8 +18,8 @@ describe('bytes testing', () => {
     expect(bytes.buffer[0]).toBe(1);
     expect(bytes.buffer[1]).toBe(0);
 
-    expect(bytes.readBool()).toBe(true);
-    expect(bytes.readBool()).toBe(false);
+    expect(bytes.readBoolean()).toBe(true);
+    expect(bytes.readBoolean()).toBe(false);
     expect(bytes.buffer).toHaveLength(0);
   });
 
@@ -43,10 +43,24 @@ describe('bytes testing', () => {
     expect(bytes.buffer).toHaveLength(0);
   });
 
+  it('read/write float', () => {
+    const value = 254.002001923;
+    bytes.writeFloat(value);
+    expect(bytes.readFloat()).toBe(value);
+    expect(bytes.buffer).toHaveLength(0);
+  });
+
   it('read/write string', () => {
     const value = "Olá mundo... Hello world! <3";
     bytes.writeText(value);
     expect(bytes.readText()).toBe(value);
+    expect(bytes.buffer).toHaveLength(0);
+  });
+
+  it('read/write encoded string', () => {
+    const value = "Olá mundo... Hello world! <3";
+    bytes.writeEncodedText(value);
+    expect(bytes.readEncodedText()).toBe(value);
     expect(bytes.buffer).toHaveLength(0);
   });
 });

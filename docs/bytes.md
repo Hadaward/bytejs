@@ -1,4 +1,5 @@
 - :warning: Documentation can change at any time so it's important to stay tuned.
+- :warning: This documentations is outdated and doesn't complain with reality anymore. I will be writing a new documentation sooner.
 
 ## ByteJS
 For ByteJS to work, it is necessary to create a bytearray capable of writing and reading primitive types in the array. Supported types are listed below with their respective size in bytes and their representation.

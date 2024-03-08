@@ -2,9 +2,6 @@ import { Bytes } from "../bytes.js";
 import { OPCODES } from "../opcodes.js";
 
 export type DetransformerOptions = {
-  /**
-   * This option is still unstable, use at your own risk.
-   */
   decodeText: boolean;
 }
 

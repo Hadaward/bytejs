@@ -3,9 +3,6 @@ import { Bytes } from "../bytes.js";
 import { OPCODES } from "../opcodes.js";
 
 export type TransformerOptions = {
-  /**
-   * This option is still unstable, use at your own risk.
-   */
   encodeText?: boolean;
 }
 

@@ -1,5 +1,55 @@
 import { TextDecoder, TextEncoder } from "util";
 
+/**
+ * This is a simple text encoder using a algorithm that will sum up the last sum with the current byte
+ */
+export function basicTextEncoder(bytes: Bytes, textBytes: Uint8Array): void {
+  bytes.writeNumber(textBytes.length);
+
+  let lastByte;
+  for (let k=0; k<textBytes.length;k++) {
+    let result = textBytes[k];
+
+    if (lastByte) {
+      result = (result + lastByte) % 65535;
+    }
+
+    bytes.writeShort(result);
+    lastByte = result;
+  }
+}
+
+/**
+ * This is a simple text decoder using a algorithm that will subtract down the current byte with the last result
+ */
+export function basicTextDecoder(bytes: Bytes): Uint8Array {
+  const size = bytes
+  .readNumber();
+
+    const resultBytes = [];
+
+    let lastByte;
+    for (let i=0; i<size; i++) {
+      const byte = bytes.readShort();
+
+      if (!lastByte) {
+        resultBytes.push(byte);
+      } else {
+        let result = byte - lastByte;
+
+        if (result < 0) {
+          result = 255 - result;
+        }
+
+        resultBytes.push(result);
+      }
+
+      lastByte = byte;
+    }
+
+    return new Uint8Array(resultBytes);
+}
+
 export class Bytes {
   private bytes: number[];
   private encoder: TextEncoder = new TextEncoder();
@@ -80,30 +130,8 @@ export class Bytes {
     }
   }
 
-  writeEncodedText(text: string): void {
-    const bytes = this.encoder.encode(text);
-    this.writeNumber(bytes.length);
-    // 65 - 70 - 48 - 76
-    // 65 - 135 - 183 - 259 (4)
-    /**
-     * solve:
-     * 135 - 65 = 70
-     * 183 - 135 = 48
-     * 4 - 183 = -179 = 255 - 179 = 76
-     */
-
-    console.log(bytes)
-
-    let lastByte;
-    for (let k=0; k<bytes.length;k++) {
-      if (!lastByte) {
-        this.writeByte(bytes[k]);
-      } else {
-        this.writeByte((bytes[k] + lastByte) & 255);
-      }
-
-      lastByte = bytes[k];
-    }
+  writeEncodedText(text: string, encoder: typeof basicTextEncoder = basicTextEncoder): void {
+    encoder?.(this, this.encoder.encode(text));
   }
 
   readByte(): number {
@@ -138,34 +166,8 @@ export class Bytes {
     return this.decoder.decode(new Uint8Array(this.readBytes(this.readNumber())));
   }
 
-  readEncodedText(): string {
-    const size = this.readNumber();
-
-    const bytes = [];
-
-    let lastByte;
-    for (let i=0; i<size; i++) {
-      const byte = this.readByte();
-
-      if (!lastByte) {
-        bytes.push(byte);
-      } else {
-        let result = byte - lastByte;
-
-        if (result < 0) {
-          console.log(byte, lastByte, result)
-          result = 255 - result;
-        }
-
-        bytes.push(result);
-      }
-
-      lastByte = byte;
-    }
-
-    console.log(bytes);
-
-    return this.decoder.decode(new Uint8Array(bytes));
+  readEncodedText(decoder: typeof basicTextDecoder = basicTextDecoder): string {
+    return this.decoder.decode(decoder(this));
   }
 
   readNumber(): number {

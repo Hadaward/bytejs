@@ -5,5 +5,7 @@ export const OPCODES = {
   MemberExpression: 3,
   Identifier: 4,
   Literal: 5,
-  ChainExpression: 6
+  ChainExpression: 6,
+  VariableDeclaration: 7,
+  BinaryExpression: 8
 }

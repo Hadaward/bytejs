@@ -1,4 +1,4 @@
-import { BaseNode, CallExpressionNode, ExpressionStatementNode, IdentifierNode, LiteralNode, MemberExpressionNode, ProgramNode } from "../ast-types.js";
+import { BaseNode, BinaryExpression, CallExpressionNode, ExpressionStatementNode, IdentifierNode, LiteralNode, MemberExpressionNode, ProgramNode, VariableDeclaration } from "../ast-types.js";
 import { Bytes } from "../bytes.js";
 import { OPCODES } from "../opcodes.js";
 
@@ -84,5 +84,26 @@ export default {
   ChainExpression: function(bytes: Bytes, node: ExpressionStatementNode, options: TransformerOptions = { encodeText: false }): void {
     bytes.writeByte(OPCODES[node.type]);
     this.transformNode(bytes, node.expression, options);
+  },
+
+  VariableDeclaration: function(bytes: Bytes, node: VariableDeclaration, options: TransformerOptions = { encodeText: false }): void {
+    bytes.writeByte(OPCODES[node.type]);
+    bytes.writeByte(node.kind === 'var' ? 0 : node.kind === 'let' ? 1 : 2);
+    bytes.writeNumber(node.declarations.length);
+
+    for (const declaration of node.declarations) {
+      this.transformNode(bytes, declaration.id, options);
+      bytes.writeBoolean(declaration.init !== null);
+      if (declaration.init !== null)
+        this.transformNode(bytes, declaration.init, options);
+    }
+  },
+
+  BinaryExpression: function(bytes: Bytes, node: BinaryExpression, options: TransformerOptions = { encodeText: false }): void {
+    bytes.writeByte(OPCODES[node.type]);
+    bytes[options.encodeText ? "writeEncodedText" : "writeText"](node.operator);
+
+    this.transformNode(bytes, node.left, options);
+    this.transformNode(bytes, node.right, options);
   }
 }

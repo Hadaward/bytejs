@@ -34,3 +34,21 @@ export type LiteralNode = BaseNode & {
   type: "Literal";
   value: unknown;
 }
+
+export type VariableDeclarator = BaseNode & {
+  id: IdentifierNode;
+  init: BaseNode;
+}
+
+export type VariableDeclaration = BaseNode & {
+  type: "VariableDeclaration";
+  kind: "var" | "let" | "const";
+  declarations: VariableDeclarator[];
+}
+
+export type BinaryExpression = BaseNode & {
+  type: "BinaryExpression";
+  left: BaseNode;
+  right: BaseNode;
+  operator: string;
+}

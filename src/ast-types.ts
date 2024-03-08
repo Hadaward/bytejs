@@ -10,13 +10,15 @@ export type ProgramNode = BaseNode & {
 export type MemberExpressionNode = BaseNode & {
   object: BaseNode,
   computed: boolean,
-  property: BaseNode
+  property: BaseNode,
+  optional?: boolean
 }
 
 export type CallExpressionNode = BaseNode & {
   type: "CallExpression"
   callee: MemberExpressionNode;
   arguments: BaseNode[];
+  optional?: boolean;
 }
 
 export type ExpressionStatementNode = BaseNode & {
@@ -30,5 +32,5 @@ export type IdentifierNode = BaseNode & {
 
 export type LiteralNode = BaseNode & {
   type: "Literal";
-  value: string;
+  value: unknown;
 }

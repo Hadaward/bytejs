@@ -13,7 +13,9 @@ describe('bytecodes', () => {
     console.log(foo);
     `;
     const bytes = generateBytes(source);
+    const code = generateCode(bytes);
 
     console.log(bytes.toString(), bytes.buffer);
+    console.log(code);
   })
 });

@@ -76,6 +76,10 @@ export class Bytes {
     this.bytes.push(byte & 255);
   }
 
+  writeBytes(bytes: number[]): void {
+    bytes.forEach((byte) => this.writeByte(byte));
+  }
+
   writeBoolean(bool: boolean): void {
     this.writeByte(bool === true ? 1 : 0);
   }
@@ -84,6 +88,7 @@ export class Bytes {
     if (!Number.isInteger(number)) {
       this.writeByte(this.FLOAT_NUMBER);
       this.writeFloat(number);
+      return;
     }
 
     if (number < 256) {
@@ -135,6 +140,9 @@ export class Bytes {
   }
 
   readByte(): number {
+    if (this.bytes.length < 1) {
+      throw new RangeError(`Expected at least 1 byte, got ${this.bytes.length}`);
+    }
     return this.bytes.shift();
   }
 

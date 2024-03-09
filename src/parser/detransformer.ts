@@ -67,23 +67,10 @@ export default {
         const computed = bytes.readBoolean();
         const optional = bytes.readBoolean();
 
-
         const object = this.detransformNode(bytes, options);
         const property = this.detransformNode(bytes, options);
 
-        let result = object;
-
-        if (optional) {
-          result += "?.";
-        }
-
-        if (computed) {
-          result += `[${property}]`;
-        } else {
-          result += property;
-        }
-
-        return result;
+        return `${object}${optional ? "?." : "."}${computed ? `[${property}]` : property}`;
     },
 
     [OPCODES.Identifier]: function(bytes: Bytes, options: DetransformerOptions = { decodeText: false }): string {
@@ -100,5 +87,29 @@ export default {
       } else {
         return String(bytes.readBoolean());
       }
+    },
+
+    [OPCODES.VariableDeclaration]: function(bytes: Bytes, options: DetransformerOptions = { decodeText: false }): string {
+        const kind = ['var', 'let', 'const'][bytes.readByte()];
+        const declarationCount = bytes.readNumber();
+
+        const declarations: string[] = [];
+
+        for (let i = 0; i < declarationCount; i++) {
+          const id = this.detransformNode(bytes, options);
+          const init = bytes.readBoolean() ? this.detransformNode(bytes, options) : null;
+
+          declarations.push(`${id}${init !== null ? `=${init}` : ''}`);
+        }
+
+        return `${kind} ${declarations.join(',')};`;
+    },
+
+    [OPCODES.BinaryExpression]: function(bytes: Bytes, options: DetransformerOptions = { decodeText: false }): string {
+        const operator = bytes[options.decodeText ? "readEncodedText" : "readText"]();
+        const left = this.detransformNode(bytes, options);
+        const right = this.detransformNode(bytes, options);
+
+        return `${left}${operator}${right}`;
     }
 }

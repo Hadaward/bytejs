@@ -53,14 +53,18 @@ describe('bytes testing', () => {
   it('read/write string', () => {
     const value = "Olá mundo... Hello world! <3";
     bytes.writeText(value);
+    bytes.writeByte(0);
     expect(bytes.readText()).toBe(value);
+    bytes.readByte();
     expect(bytes.buffer).toHaveLength(0);
   });
 
   it('read/write encoded string', () => {
     const value = "Olá mundo... Hello world! <3";
     bytes.writeEncodedText(value);
+    bytes.writeByte(0);
     expect(bytes.readEncodedText()).toBe(value);
+    bytes.readByte();
     expect(bytes.buffer).toHaveLength(0);
   });
 });

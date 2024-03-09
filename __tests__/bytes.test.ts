@@ -50,21 +50,30 @@ describe('bytes testing', () => {
     expect(bytes.buffer).toHaveLength(0);
   });
 
+  it('read/write number', () => {
+    let value = 252224.2001923;
+    bytes.writeNumber(value);
+    expect(bytes.readNumber()).toBe(value);
+
+    value = 120300020;
+
+    bytes.writeNumber(value);
+    expect(bytes.readNumber()).toBe(value);
+
+    expect(bytes.buffer).toHaveLength(0);
+  });
+
   it('read/write string', () => {
     const value = "Olá mundo... Hello world! <3";
     bytes.writeText(value);
-    bytes.writeByte(0);
     expect(bytes.readText()).toBe(value);
-    bytes.readByte();
     expect(bytes.buffer).toHaveLength(0);
   });
 
   it('read/write encoded string', () => {
     const value = "Olá mundo... Hello world! <3";
     bytes.writeEncodedText(value);
-    bytes.writeByte(0);
     expect(bytes.readEncodedText()).toBe(value);
-    bytes.readByte();
     expect(bytes.buffer).toHaveLength(0);
   });
 });
